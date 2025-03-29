@@ -27,7 +27,7 @@ export default function ResultsSummary({ results }: ResultsSummaryProps) {
       <Card className="bg-white border border-neutral-200 shadow-sm">
         <CardContent className="p-4">
           <p className="text-sm text-neutral-600 mb-1">Total Withdrawal</p>
-          <p className="text-xl font-bold text-secondary">
+          <p className="text-xl font-bold text-neutral-800">
             {formatCurrency(totalWithdrawal)}
           </p>
         </CardContent>
@@ -45,7 +45,7 @@ export default function ResultsSummary({ results }: ResultsSummaryProps) {
       <Card className="bg-white border border-neutral-200 shadow-sm">
         <CardContent className="p-4">
           <p className="text-sm text-neutral-600 mb-1">Investment Growth</p>
-          <p className="text-xl font-bold text-accent">
+          <p className="text-xl font-bold text-neutral-800">
             {growthPercentage >= 0 ? "+" : ""}
             {growthPercentage.toFixed(1)}%
           </p>

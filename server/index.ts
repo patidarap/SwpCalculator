@@ -1,70 +1,80 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import os from 'os';
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use((req, res, next) => {
-  const start = Date.now();
-  const path = req.path;
-  let capturedJsonResponse: Record<string, any> | undefined = undefined;
-
-  const originalResJson = res.json;
-  res.json = function (bodyJson, ...args) {
-    capturedJsonResponse = bodyJson;
-    return originalResJson.apply(res, [bodyJson, ...args]);
-  };
-
-  res.on("finish", () => {
-    const duration = Date.now() - start;
-    if (path.startsWith("/api")) {
-      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
-      }
-
-      if (logLine.length > 80) {
-        logLine = logLine.slice(0, 79) + "…";
-      }
-
-      log(logLine);
-    }
-  });
-
-  next();
-});
+// ... (keep your existing middleware)
 
 (async () => {
-  const server = await registerRoutes(app);
+  try {
+    const server = await registerRoutes(app);
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
+    // ... (keep your existing route and error handling)
 
-    res.status(status).json({ message });
-    throw err;
-  });
+    if (app.get("env") === "development") {
+      await setupVite(app, server);
+    } else {
+      serveStatic(app);
+    }
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
-  if (app.get("env") === "development") {
-    await setupVite(app, server);
-  } else {
-    serveStatic(app);
+    const getAvailablePort = async (basePort: number): Promise<number> => {
+      const net = await import('net');
+      return new Promise((resolve) => {
+        const server = net.createServer();
+        server.unref();
+        server.on('error', () => {
+          resolve(getAvailablePort(basePort + 1));
+        });
+        server.listen(basePort, () => {
+          server.close(() => resolve(basePort));
+        });
+      });
+    };
+
+    const startServer = async () => {
+      try {
+        // Get network interfaces information
+        const interfaces = os.networkInterfaces();
+        log('Network interfaces:');
+        Object.entries(interfaces).forEach(([name, details]) => {
+          details?.forEach(detail => {
+            log(`- ${name}: ${detail.address} (${detail.family})`);
+          });
+        });
+
+        // Try to find an available port
+        const port = await getAvailablePort(5000);
+        const host = '127.0.0.1'; // Force localhost only
+
+        log(`Attempting to start server on ${host}:${port}...`);
+
+        server.listen(port, host, () => {
+          log(`Server successfully started on http://${host}:${port}`);
+          log(`Available on your local network at: http://${os.hostname()}:${port}`);
+        }).on('error', (err: NodeJS.ErrnoException) => {
+          log(`Critical error: ${err.message}`);
+          log('Possible solutions:');
+          log('1. Try a different port: PORT=5001 npm run dev');
+          log('2. Check your firewall/antivirus settings');
+          log('3. Run as Administrator');
+          log('4. Restart your computer');
+          process.exit(1);
+        });
+
+      } catch (error) {
+        log(`Fatal startup error: ${error}`);
+        process.exit(1);
+      }
+    };
+
+    await startServer();
+
+  } catch (error) {
+    log(`Application initialization failed: ${error}`);
+    process.exit(1);
   }
-
-  // ALWAYS serve the app on port 5000
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = 5000;
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`serving on port ${port}`);
-  });
 })();

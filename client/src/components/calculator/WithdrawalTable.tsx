@@ -36,8 +36,8 @@ export default function WithdrawalTable({ data }: WithdrawalTableProps) {
             <TableRow key={row.year}>
               <TableCell className="text-sm text-neutral-800">{row.year}</TableCell>
               <TableCell className="text-sm text-neutral-800">{formatCurrency(row.openingBalance)}</TableCell>
-              <TableCell className="text-sm text-secondary">{formatCurrency(row.withdrawals)}</TableCell>
-              <TableCell className="text-sm text-accent">{formatCurrency(row.growth)}</TableCell>
+              <TableCell className="text-sm text-neutral-800">{formatCurrency(row.withdrawals)}</TableCell>
+              <TableCell className="text-sm text-neutral-800">{formatCurrency(row.growth)}</TableCell>
               <TableCell className="text-sm text-primary">{formatCurrency(row.closingBalance)}</TableCell>
             </TableRow>
           ))}
