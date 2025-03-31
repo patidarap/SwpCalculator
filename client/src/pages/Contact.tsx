@@ -43,13 +43,13 @@ export default function Contact() {
                 </div>
                 <h3 className="font-bold mb-2">Call Us</h3>
                 <p className="text-neutral-600 mb-2">Mon-Fri, 9am-5pm</p>
-                <a href="tel:+1234567890" className="text-primary font-medium">
-                  +1 (234) 567-890
+                <a href="tel:+91 8815654577" className="text-primary font-medium">
+                 +91 8815654577
                 </a>
               </CardContent>
             </Card>
             
-            <Card>
+            {/* <Card>
               <CardContent className="p-6 flex flex-col items-center text-center">
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                   <MapPin className="h-6 w-6 text-primary" />
@@ -60,7 +60,7 @@ export default function Contact() {
                   123 Financial Street, Suite 456
                 </address>
               </CardContent>
-            </Card>
+            </Card> */}
           </div>
           
           <Card className="overflow-hidden">
@@ -85,7 +85,7 @@ export default function Contact() {
                     <Phone className="h-5 w-5 mr-3 mt-0.5" />
                     <div>
                       <h4 className="font-medium">Phone</h4>
-                      <p className="opacity-90">+1 (234) 567-890</p>
+                      <p className="opacity-90">+91 8815654577</p>
                     </div>
                   </div>
                 </div>

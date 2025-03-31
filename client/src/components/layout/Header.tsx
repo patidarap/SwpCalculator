@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { LineChart } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,12 @@ export default function Header() {
   const [location] = useLocation();
   const isMobile = useMobile();
   const [isOpen, setIsOpen] = useState(false);
+
+    // Add this useEffect hook
+    useEffect(() => {
+      window.scrollTo(0, 0);
+    }, [location]); // This will run whenever the location changes
+  
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
